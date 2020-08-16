@@ -1,0 +1,17 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/ugv/catkin_ws/devel/include",
+        "/opt/ros/kinetic/include",
+        "/home/ugv/catkin_ws/src/call_cartographer_service/call_cartographer_service/include",
+        "/usr/include"
+      ],
+      "name": "Linux"
+    }
+  ]
+}
