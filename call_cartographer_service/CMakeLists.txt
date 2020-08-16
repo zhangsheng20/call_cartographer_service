@@ -121,8 +121,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
+ include  
+ ${catkin_INCLUDE_DIRS}
+ ${cartographer_ros_msgs_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -149,7 +150,7 @@ include_directories(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#add_dependencies(cartographer_ros_msgs call_cartographer_service_gencpp)
+add_dependencies(call_cartographer_service cartographer_ros_msgs_gencpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(
