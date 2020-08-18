@@ -1,0 +1,566 @@
+status: 
+  code: 0
+  message: "Successfully read metrics."
+metric_families: 
+  - 
+    name: "mapping_constraints_constraint_builder_2d_constraints"
+    description: "Constraints computed"
+    metrics: 
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "matcher"
+            value: "searched"
+          - 
+            key: "search_region"
+            value: "local"
+        value: 565.0
+        counts_by_bucket: []
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "matcher"
+            value: "found"
+          - 
+            key: "search_region"
+            value: "local"
+        value: 44.0
+        counts_by_bucket: []
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "matcher"
+            value: "searched"
+          - 
+            key: "search_region"
+            value: "global"
+        value: 1.0
+        counts_by_bucket: []
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "matcher"
+            value: "found"
+          - 
+            key: "search_region"
+            value: "global"
+        value: 1.0
+        counts_by_bucket: []   
+  - 
+
+    name: "mapping_global_trajectory_builder_local_slam_results"
+    description: "Local SLAM results"
+    metrics: 
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "type"
+            value: "MatchingResult"
+        value: 260.0
+        counts_by_bucket: []
+      - 
+        type: 0
+        labels: 
+          - 
+            key: "type"
+            value: "InsertionResult"
+        value: 113.0
+        counts_by_bucket: []
+  - 
+    name: "collator_input_total"
+    description: "Sensor data received"
+    metrics: []
+  - 
+    name: "mapping_constraints_constraint_builder_2d_queue_length"
+    description: "Queue length"
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 4.0
+        counts_by_bucket: []
+  - 
+    name: "mapping_constraints_constraint_builder_3d_queue_length"
+    description: "Queue length"
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 0.0
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_local_trajectory_builder_latency"
+    description: "Duration from first incoming point cloud in accumulation to local slam result"
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 0.115312158
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_local_trajectory_builder_real_time_ratio"
+    description: "sensor duration / wall clock duration."
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 0.693993602999
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_local_trajectory_builder_cpu_real_time_ratio"
+    description: "sensor duration / cpu duration."
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 2.07172265899
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_pose_graph_work_queue_delay"
+    description: "Age of the oldest entry in the work queue in seconds"
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 1.09e-06
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_pose_graph_work_queue_size"
+    description: "Number of items in the work queue"
+    metrics: 
+      - 
+        type: 1
+        labels: []
+        value: 0.0
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_pose_graph_constraints"
+    description: "Current number of constraints in the pose graph"
+    metrics: 
+      - 
+        type: 1
+        labels: 
+          - 
+            key: "tag"
+            value: "inter_submap"
+          - 
+            key: "trajectory"
+            value: "different"
+        value: 36.0
+        counts_by_bucket: []
+      - 
+        type: 1
+        labels: 
+          - 
+            key: "tag"
+            value: "inter_submap"
+          - 
+            key: "trajectory"
+            value: "same"
+        value: 0.0
+        counts_by_bucket: []
+  - 
+    name: "mapping_2d_pose_graph_submaps"
+    description: "Number of submaps in the pose graph."
+    metrics: 
+      - 
+        type: 1
+        labels: 
+          - 
+            key: "state"
+            value: "active"
+        value: 3.0
+        counts_by_bucket: []
+      - 
+        type: 1
+        labels: 
+          - 
+            key: "state"
+            value: "frozen"
+        value: 21.0
+        counts_by_bucket: []
+      - 
+        type: 1
+        labels: 
+          - 
+            key: "state"
+            value: "deleted"
+        value: 3.0
+        counts_by_bucket: [] 
+  - 
+    name: "mapping_constraints_constraint_builder_2d_scores"
+    description: "Constraint scores built"
+    metrics: 
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "search_region"
+            value: "local"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.05
+            count: 0.0
+          - 
+            bucket_boundary: 0.1
+            count: 0.0
+          - 
+            bucket_boundary: 0.15
+            count: 0.0
+          - 
+            bucket_boundary: 0.2
+            count: 0.0
+          - 
+            bucket_boundary: 0.25
+            count: 0.0
+          - 
+            bucket_boundary: 0.3
+            count: 0.0
+          - 
+            bucket_boundary: 0.35
+            count: 0.0
+          - 
+            bucket_boundary: 0.4
+            count: 0.0
+          - 
+            bucket_boundary: 0.45
+            count: 0.0
+          - 
+            bucket_boundary: 0.5
+            count: 0.0
+          - 
+            bucket_boundary: 0.55
+            count: 0.0
+          - 
+            bucket_boundary: 0.6
+            count: 0.0
+          - 
+            bucket_boundary: 0.65
+            count: 0.0
+          - 
+            bucket_boundary: 0.7
+            count: 34.0
+          - 
+            bucket_boundary: 0.75
+            count: 10.0
+          - 
+            bucket_boundary: 0.8
+            count: 0.0
+          - 
+            bucket_boundary: 0.85
+            count: 0.0
+          - 
+            bucket_boundary: 0.9
+            count: 0.0
+          - 
+            bucket_boundary: 0.95
+            count: 0.0
+          - 
+            bucket_boundary: 1.0
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "search_region"
+            value: "global"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.05
+            count: 0.0
+          - 
+            bucket_boundary: 0.1
+            count: 0.0
+          - 
+            bucket_boundary: 0.15
+            count: 0.0
+          - 
+            bucket_boundary: 0.2
+            count: 0.0
+          - 
+            bucket_boundary: 0.25
+            count: 0.0
+          - 
+            bucket_boundary: 0.3
+            count: 0.0
+          - 
+            bucket_boundary: 0.35
+            count: 0.0
+          - 
+            bucket_boundary: 0.4
+            count: 0.0
+          - 
+            bucket_boundary: 0.45
+            count: 0.0
+          - 
+            bucket_boundary: 0.5
+            count: 0.0
+          - 
+            bucket_boundary: 0.55
+            count: 0.0
+          - 
+            bucket_boundary: 0.6
+            count: 1.0
+          - 
+            bucket_boundary: 0.65
+            count: 0.0
+          - 
+            bucket_boundary: 0.7
+            count: 0.0
+          - 
+            bucket_boundary: 0.75
+            count: 0.0
+          - 
+            bucket_boundary: 0.8
+            count: 0.0
+          - 
+            bucket_boundary: 0.85
+            count: 0.0
+          - 
+            bucket_boundary: 0.9
+            count: 0.0
+          - 
+            bucket_boundary: 0.95
+            count: 0.0
+          - 
+            bucket_boundary: 1.0
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+  - 
+    
+    name: "mapping_2d_local_trajectory_builder_scores"
+    description: "Local scan matcher scores"
+    metrics: 
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "scan_matcher"
+            value: "real_time_correlative"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.05
+            count: 0.0
+          - 
+            bucket_boundary: 0.1
+            count: 0.0
+          - 
+            bucket_boundary: 0.15
+            count: 0.0
+          - 
+            bucket_boundary: 0.2
+            count: 0.0
+          - 
+            bucket_boundary: 0.25
+            count: 0.0
+          - 
+            bucket_boundary: 0.3
+            count: 0.0
+          - 
+            bucket_boundary: 0.35
+            count: 0.0
+          - 
+            bucket_boundary: 0.4
+            count: 2.0
+          - 
+            bucket_boundary: 0.45
+            count: 18.0
+          - 
+            bucket_boundary: 0.5
+            count: 4.0
+          - 
+            bucket_boundary: 0.55
+            count: 11.0
+          - 
+            bucket_boundary: 0.6
+            count: 36.0
+          - 
+            bucket_boundary: 0.65
+            count: 90.0
+          - 
+            bucket_boundary: 0.7
+            count: 62.0
+          - 
+            bucket_boundary: 0.75
+            count: 36.0
+          - 
+            bucket_boundary: 0.8
+            count: 0.0
+          - 
+            bucket_boundary: 0.85
+            count: 0.0
+          - 
+            bucket_boundary: 0.9
+            count: 0.0
+          - 
+            bucket_boundary: 0.95
+            count: 0.0
+          - 
+            bucket_boundary: 1.0
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+  - 
+    name: "mapping_2d_local_trajectory_builder_costs"
+    description: "Local scan matcher costs"
+    metrics: 
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "scan_matcher"
+            value: "ceres"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.01
+            count: 0.0
+          - 
+            bucket_boundary: 0.02
+            count: 0.0
+          - 
+            bucket_boundary: 0.04
+            count: 0.0
+          - 
+            bucket_boundary: 0.08
+            count: 105.0
+          - 
+            bucket_boundary: 0.16
+            count: 134.0
+          - 
+            bucket_boundary: 0.32
+            count: 20.0
+          - 
+            bucket_boundary: 0.64
+            count: 0.0
+          - 
+            bucket_boundary: 1.28
+            count: 0.0
+          - 
+            bucket_boundary: 2.56
+            count: 0.0
+          - 
+            bucket_boundary: 5.12
+            count: 0.0
+          - 
+            bucket_boundary: 10.24
+            count: 0.0
+          - 
+            bucket_boundary: 20.48
+            count: 0.0
+          - 
+            bucket_boundary: 40.96
+            count: 0.0
+          - 
+            bucket_boundary: 81.92
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+  - 
+    name: "mapping_2d_local_trajectory_builder_residuals"
+    description: "Local scan matcher residuals"
+    metrics: 
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "component"
+            value: "distance"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.01
+            count: 98.0
+          - 
+            bucket_boundary: 0.02
+            count: 103.0
+          - 
+            bucket_boundary: 0.04
+            count: 43.0
+          - 
+            bucket_boundary: 0.08
+            count: 13.0
+          - 
+            bucket_boundary: 0.16
+            count: 2.0
+          - 
+            bucket_boundary: 0.32
+            count: 0.0
+          - 
+            bucket_boundary: 0.64
+            count: 0.0
+          - 
+            bucket_boundary: 1.28
+            count: 0.0
+          - 
+            bucket_boundary: 2.56
+            count: 0.0
+          - 
+            bucket_boundary: 5.12
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+      - 
+        type: 2
+        labels: 
+          - 
+            key: "component"
+            value: "angle"
+        value: 0.0
+        counts_by_bucket: 
+          - 
+            bucket_boundary: 0.01
+            count: 246.0
+          - 
+            bucket_boundary: 0.02
+            count: 12.0
+          - 
+            bucket_boundary: 0.04
+            count: 1.0
+          - 
+            bucket_boundary: 0.08
+            count: 0.0
+          - 
+            bucket_boundary: 0.16
+            count: 0.0
+          - 
+            bucket_boundary: 0.32
+            count: 0.0
+          - 
+            bucket_boundary: 0.64
+            count: 0.0
+          - 
+            bucket_boundary: 1.28
+            count: 0.0
+          - 
+            bucket_boundary: 2.56
+            count: 0.0
+          - 
+            bucket_boundary: 5.12
+            count: 0.0
+          - 
+            bucket_boundary: inf
+            count: 0.0
+  - 
+
+
+timestamp: 
+  secs: 1595938236
+  nsecs: 976451445
+
