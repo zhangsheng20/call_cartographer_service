@@ -1,14 +1,4 @@
-#include "cartographer_ros_msgs/ReadMetrics.h"
-#include "cartographer_ros_msgs/StartTrajectory.h"
-#include "cartographer_ros_msgs/FinishTrajectory.h"
-#include "cartographer_ros_msgs/GetTrajectoryStates.h"
-#include "cartographer_ros_msgs/TrajectoryQuery.h"
-#include "geometry_msgs/PoseWithCovarianceStamped.h"
 
-
-#include "ros/ros.h"
-#include "nav_msgs/Odometry.h"
-#include <tf2/LinearMath/Quaternion.h>
 #include "Node.h"
 
 
@@ -16,6 +6,8 @@
 
 Node::Node()
 {
+    deque_duration_time.fromSec(10);
+    judge_slam_state_period_sec.fromSec(0.3);
 
     start_trajectory_client=myNodeHandle.serviceClient
                             <cartographer_ros_msgs::StartTrajectory>("start_trajectory");
@@ -28,18 +20,25 @@ Node::Node()
     trajectory_query_client=myNodeHandle.serviceClient
                             <cartographer_ros_msgs::TrajectoryQuery>("trajectory_query");
 
+    ugv_odom_subscriber=myNodeHandle.subscribe<nav_msgs::Odometry>
+                        ("LaserOdomTopic", 100,&Node::HandleUgvOdom,this);  
+
+    mavros_imu_data_subscriber = myNodeHandle.subscribe<sensor_msgs::Imu>
+                        ("/mavros/imu/data", 1000, &Node::HandleMavrosImuData,this);
 
     start_trajectory_srv.request.configuration_basename="my_rplidar_localization.lua";
     start_trajectory_srv.request.configuration_directory=
             "/home/ugv/cartographer_ws/install_isolated/share/cartographer_ros/configuration_files";
-    sub_move_base_simple = myNodeHandle.subscribe  
-                <geometry_msgs::PoseWithCovarianceStamped>
-                        ("/initialpose", 1, &Node::move_base_simple_callback, this); 
-    
+    rviz_initialpose_subscriber = myNodeHandle.subscribe<geometry_msgs::PoseWithCovarianceStamped>
+                        ("/initialpose", 1, &Node::HandleRvizInitialpose, this);
+
+
+    judge_slam_state_timer_ = myNodeHandle.createTimer(judge_slam_state_period_sec,
+                        &Node::JudgeSlamState, this);
     ROS_INFO("Init over!");
 }
 
-void Node::move_base_simple_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
+void Node::HandleRvizInitialpose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg)
 {
     ROS_INFO("get_rvizpose ok!");                            
     
@@ -47,12 +46,12 @@ void Node::move_base_simple_callback(const geometry_msgs::PoseWithCovarianceStam
                                     msg->pose.pose.orientation.y,msg->pose.pose.orientation.z);
     ROS_INFO("initial_pose position    x:%f y:%f z:%f",msg->pose.pose.position.x,
                                     msg->pose.pose.position.y,msg->pose.pose.position.z);  
-    reinit_pose_from_RVIZ(msg->pose.pose);
+    ReinitPoseFromRviz(msg->pose.pose);
 
 }
 
 
-void Node::reinit_pose_from_RVIZ(geometry_msgs::Pose pose_from_rviz)
+void Node::ReinitPoseFromRviz(geometry_msgs::Pose pose_from_rviz)
 {
 
     start_trajectory_srv.request.initial_pose=pose_from_rviz;
@@ -63,46 +62,84 @@ void Node::reinit_pose_from_RVIZ(geometry_msgs::Pose pose_from_rviz)
 
     FinishTrajectory();
     StartTrajectory();
+    
 }
 
-void Node::judge_SLAM_stare()
+void Node::JudgeSlamState(const ::ros::TimerEvent& timer_event)
 { 
-    ROS_INFO("judge_SLAM_stare in!");
-    ReadMetrics();
+    ROS_INFO("JudgeSlamStare in!");
 
+    //ReadMetrics();  
+    //ShowMetricsFamily(12);
+}
+
+void Node::ShowMetricsFamily(int num)
+{
+    std::string name_switch;
+    switch (num)
+    {
+    case 1:name_switch="mapping_constraints_constraint_builder_2d_constraints";break;
+    case 2:name_switch="mapping_global_trajectory_builder_local_slam_results";break;
+    case 3:name_switch="mapping_constraints_constraint_builder_2d_queue_length";break;
+    case 4:name_switch="mapping_2d_local_trajectory_builder_latency";break;
+    case 5:name_switch="mapping_2d_local_trajectory_builder_real_time_ratio";break;
+    case 6:name_switch="mapping_2d_local_trajectory_builder_cpu_real_time_ratio";break;
+    case 7:name_switch="mapping_2d_pose_graph_work_queue_delay";break;
+    case 8:name_switch="mapping_2d_pose_graph_work_queue_size";break;
+    case 9:name_switch="mapping_2d_pose_graph_constraints";break;
+    case 10:name_switch="mapping_2d_pose_graph_submaps";break;
+    case 11:name_switch="mapping_constraints_constraint_builder_2d_scores";break;
+    case 12:name_switch="mapping_2d_local_trajectory_builder_scores";break;
+    case 13:name_switch="mapping_2d_local_trajectory_builder_costs";break;
+    case 14:name_switch="mapping_2d_local_trajectory_builder_residuals";break;
+    default:
+        break;
+    }
+
+    ROS_INFO("name: %s ",name_switch.c_str());
     for(auto& metricfamily_receive : read_metrics_srv.response.metric_families)
-    {                      
-        for(auto& metricfamily_receive_metric :metricfamily_receive.metrics)
+    {   
+        if(metricfamily_receive.name == name_switch)
         {
-            double metric_value=metricfamily_receive_metric.value;
-                
-            if(!metricfamily_receive_metric.labels.empty())
+            ROS_INFO("metrics: ");
+            for(auto& metricfamily_receive_metric :metricfamily_receive.metrics)
             {
-                std::string metric_label_value= metricfamily_receive_metric.labels[0].value;
-                std::string metric_label_key= metricfamily_receive_metric.labels[0].key;
-                if(metricfamily_receive.name == "mapping_global_trajectory_builder_local_slam_results")
-                {                     
-                    //ROS_INFO("%s: %f ",metric_label_value.c_str(),metric_value);  
-                }
-                else if(metricfamily_receive.name =="mapping_constraints_constraint_builder_2d_scores") 
+                
+                double metric_value=metricfamily_receive_metric.value;
+                
+                if(!metricfamily_receive_metric.labels.empty())
                 {
-                    ROS_INFO("metric_label_key:%s  metric_label_value:%s ",
-                                metric_label_key.c_str(),metric_label_value.c_str());
+                    ROS_INFO("  labels: ");
+                    for(auto label:metricfamily_receive_metric.labels)
+                    {
+                        std::string metric_label_key= label.key; 
+                        std::string metric_label_value= label.value;
+                        
+                        ROS_INFO("    key:  %s ",metric_label_key.c_str());            
+                        ROS_INFO("    value:%s ",metric_label_value.c_str());                                                                           
+                    }
+
+                }                
+                ROS_INFO("  value:%f ",metric_value);
+                if(!metricfamily_receive_metric.counts_by_bucket.empty()) // counts_by_bucket
+                {
+                    ROS_INFO("  counts_by_bucket: ");
                     for(auto& metric_counts_by_bucket : metricfamily_receive_metric.counts_by_bucket)
                     {
                         ROS_INFO("    bucket_boundary:%f  count:%f ",
                             metric_counts_by_bucket.bucket_boundary,metric_counts_by_bucket.count) ;
+                                  
                     }
-                    
+ 
                 }
+                ROS_INFO("  ");
+                
             }
-
-        }
+            ROS_INFO("\n");
+        }                   
 
     }
 
-    
- 
 }
 
 void Node::GetTrajectoryStates()
@@ -149,12 +186,63 @@ void Node::FinishTrajectory()
 
 void Node::ReadMetrics()
 {
-    if (read_metrics_client.call(read_metrics_srv))
-    {
-        ROS_INFO("read_metrics ok!");
-    }
+    read_metrics_client.call(read_metrics_srv);
+    ROS_INFO("read_metrics response:%s",read_metrics_srv.response.status.message.c_str());
 }
 
 Node::~Node()
 {
 }
+
+
+template <typename T>
+void Node::TrimDequeData(std::deque<T>* data) 
+{
+    data->pop_front();
+}
+
+void Node::TrimMavrosImuData() 
+{
+
+    while(mavros_imu_data_.back().header.stamp-mavros_imu_data_.front().header.stamp
+                                    >deque_duration_time)
+    {
+        TrimDequeData<sensor_msgs::Imu>(&mavros_imu_data_);
+    }
+}
+
+
+void Node::TrimUgvOdomData()
+{
+    while(ugv_odom_data_.back().header.stamp-ugv_odom_data_.front().header.stamp
+                                        >deque_duration_time)
+    {
+        TrimDequeData<nav_msgs::Odometry>(&ugv_odom_data_);
+    }
+    
+}
+
+void Node::HandleUgvOdom(const nav_msgs::Odometry::ConstPtr& msg)
+{
+       
+    nav_msgs::Odometry input;
+    input.child_frame_id=msg->child_frame_id;
+    input.header=msg->header;
+    input.pose=msg->pose;
+    input.twist=msg->twist;
+    ugv_odom_data_.push_back(input);
+    TrimUgvOdomData();
+
+}
+void Node::HandleMavrosImuData(const sensor_msgs::Imu::ConstPtr& msg)
+{
+    sensor_msgs::Imu input;
+    input.header=msg->header;
+    input.orientation=msg->orientation;
+    input.angular_velocity=msg->angular_velocity;
+    mavros_imu_data_.push_back(input);
+    TrimMavrosImuData();
+
+}
+
+

@@ -12,21 +12,31 @@
 
 
 
-//rosrun 
+//rosrun call_cartographer_service call_cartographer_service
 
 
 int main(int argc,char **argv)
 {
     ros::init(argc,argv,"call_carto_service");
     
-    int call_service_frequency=1;
+    int call_service_frequency=5;
     Node mycall;   
 
-    ros::spin();
+    ros::Rate rate(call_service_frequency);
+
+    
+    while (mycall.myNodeHandle.ok())
+    {
+
+        ros::spinOnce();
+
+        rate.sleep();
+    }
     ROS_INFO("ROS over!");
 
     return 0;
     
 
 }
+
 
