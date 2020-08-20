@@ -21,7 +21,7 @@ Node::Node()
                             <cartographer_ros_msgs::TrajectoryQuery>("trajectory_query");
 
     ugv_odom_subscriber=myNodeHandle.subscribe<nav_msgs::Odometry>
-                        ("LaserOdomTopic", 100,&Node::HandleUgvOdom,this);  
+                        ("UgvOdomTopic", 100,&Node::HandleUgvOdom,this);  
 
     mavros_imu_data_subscriber = myNodeHandle.subscribe<sensor_msgs::Imu>
                         ("/mavros/imu/data", 1000, &Node::HandleMavrosImuData,this);
@@ -68,7 +68,8 @@ void Node::ReinitPoseFromRviz(geometry_msgs::Pose pose_from_rviz)
 void Node::JudgeSlamState(const ::ros::TimerEvent& timer_event)
 { 
     ROS_INFO("JudgeSlamStare in!");
-
+    Mymonitor.ComparePose();
+    //ComparePose();
     //ReadMetrics();  
     //ShowMetricsFamily(12);
 }
@@ -225,24 +226,45 @@ void Node::TrimUgvOdomData()
 void Node::HandleUgvOdom(const nav_msgs::Odometry::ConstPtr& msg)
 {
        
-    nav_msgs::Odometry input;
+/*     nav_msgs::Odometry input;
     input.child_frame_id=msg->child_frame_id;
     input.header=msg->header;
     input.pose=msg->pose;
     input.twist=msg->twist;
     ugv_odom_data_.push_back(input);
-    TrimUgvOdomData();
+    TrimUgvOdomData(); */
+    Mymonitor.HandleUgvOdom(msg);
 
 }
 void Node::HandleMavrosImuData(const sensor_msgs::Imu::ConstPtr& msg)
 {
-    sensor_msgs::Imu input;
+/*     sensor_msgs::Imu input;
     input.header=msg->header;
     input.orientation=msg->orientation;
     input.angular_velocity=msg->angular_velocity;
     mavros_imu_data_.push_back(input);
-    TrimMavrosImuData();
+    TrimMavrosImuData(); */
+    Mymonitor.HandleMavrosImuData(msg);
 
 }
 
 
+ void Node::ComparePose()
+ {
+    if(!mavros_imu_data_.empty()&& !ugv_odom_data_.empty())
+    {
+        auto imu_orientation_msg = mavros_imu_data_.back().orientation;
+        auto ugv_orientation_msg=ugv_odom_data_.back().pose.pose.orientation;  
+        tf2::Quaternion imu_to_ugv;
+        tf2::Quaternion imu_orientation_tf2;
+        tf2::Quaternion ugv_orientation_tf2;
+        tf2::fromMsg(imu_orientation_msg,imu_orientation_tf2);
+        tf2::fromMsg(ugv_orientation_msg,ugv_orientation_tf2);
+        imu_to_ugv=imu_orientation_tf2*ugv_orientation_tf2.inverse();   
+        
+        imu_to_ugv_.push_back(imu_to_ugv);
+        ROS_INFO("imu_to_ugv:%f",double(imu_to_ugv.getAngle()));
+        //imu_to_ugv*ugv=imu   than imu_to_ugv = imu *ugv^-1
+    }
+    
+ }

@@ -11,9 +11,10 @@
 #include "sensor_msgs/Imu.h"
 #include "nav_msgs/Odometry.h"
 #include <tf2/LinearMath/Quaternion.h>
-
+#include <tf2/transform_datatypes.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <deque>
-
+#include "monitor_slam_state.h"
 
 class Node
 {
@@ -38,11 +39,12 @@ private:
     ros::Duration deque_duration_time=ros::Duration(10);
     std::deque<sensor_msgs::Imu> mavros_imu_data_;
     std::deque<nav_msgs::Odometry> ugv_odom_data_;
+    std::deque<tf2::Quaternion> imu_to_ugv_;    
 
     ros::Duration judge_slam_state_period_sec=ros::Duration(0.3);
     ros::Timer judge_slam_state_timer_;
 
-
+    
     void HandleRvizInitialpose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
     void HandleUgvOdom(const nav_msgs::Odometry::ConstPtr& msg);
     void HandleMavrosImuData(const sensor_msgs::Imu::ConstPtr& msg);
@@ -55,6 +57,7 @@ private:
     Node();
     ~Node();
     ros::NodeHandle myNodeHandle;
+    MonitorSlamState Mymonitor;
     void GetTrajectoryStates();
     void UpdateTrajectoryQuery();
     void StartTrajectory();
@@ -65,5 +68,6 @@ private:
     int GetCurrentTrajectoryId();
     void ReinitPoseFromRviz(geometry_msgs::Pose pose_from_rviz);
     void JudgeSlamState(const ::ros::TimerEvent& timer_event);
+    void ComparePose();
 };
 

@@ -128,7 +128,10 @@ include_directories(
 
 ## Declare a C++ library
 add_library(
- Node src/Node.cpp
+ Node
+ src/monitor_slam_state.cpp
+ src/Node.cpp
+ 
 )
 
 ## Add cmake target dependencies of the library
@@ -150,11 +153,11 @@ add_library(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(Node cartographer_ros_msgs_gencpp)
+add_dependencies(call_cartographer_service cartographer_ros_msgs_gencpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(
-   call_cartographer_service Node ${catkin_LIBRARIES}
+   call_cartographer_service Node  ${catkin_LIBRARIES}
 
 )
 
