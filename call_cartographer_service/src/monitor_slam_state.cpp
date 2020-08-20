@@ -34,7 +34,11 @@ MonitorSlamState::~MonitorSlamState()
         imu_to_ugv.setRotation(imu_orientation_tf2*ugv_orientation_tf2.inverse());   
         imu_to_ugv.stamp_=mavros_imu_data_.back().header.stamp;
         imu_to_ugv_.push_back(imu_to_ugv);
-        ROS_INFO("imu_to_ugv:%f",double(imu_to_ugv.getRotation().getAngle()));
+        double imu_orientation_R,imu_orientation_P,imu_orientation_Y;
+        tf2::Matrix3x3(imu_orientation_tf2).getRPY
+                                (imu_orientation_R,imu_orientation_P,imu_orientation_Y);
+        ROS_INFO("imu_orientation_Y:%f",imu_orientation_Y);                     
+        ROS_INFO("imu_to_ugv:%f",double(imu_to_ugv.getRotation().getAngleShortestPath()));
         //imu_to_ugv*ugv=imu   than imu_to_ugv = imu *ugv^-1
     }
  }
@@ -101,12 +105,18 @@ void MonitorSlamState::SetNewTrajectory(int trajectory_id,ros::Time time_begin)
 }
 void MonitorSlamState::CalcMeanImuToUgv()
 {
-    if(imu_to_ugv_.back().stamp_-time_begin_>init_wait_duration)
+    ros::Duration calc_data_duration=ros::Duration(3);
+    if(imu_to_ugv_.back().stamp_-time_begin_>(init_wait_duration+calc_data_duration))
     {
+        double sum=0 ;
+        for(auto imu_to_ugv:imu_to_ugv_)
+        {
+            sum+=imu_to_ugv.getRotation().getAngleShortestPath();
 
 
 
 
+        }
     }
 
 
