@@ -24,6 +24,8 @@ private:
     ros::Duration init_wait_duration=ros::Duration(3);
 
     ros::Duration deque_duration_time=ros::Duration(10);
+    ros::Duration calc_mean_duration=ros::Duration(3);
+    
     std::deque<sensor_msgs::Imu> mavros_imu_data_;
     std::deque<nav_msgs::Odometry> ugv_odom_data_;
     std::deque<tf2::Stamped<tf2::Transform>> imu_to_ugv_;

@@ -28,7 +28,7 @@ Node::Node()
 
     start_trajectory_srv.request.configuration_basename="my_rplidar_localization.lua";
     start_trajectory_srv.request.configuration_directory=
-            "/home/ugv/cartographer_ws/install_isolated/share/cartographer_ros/configuration_files";
+            "/home/sheng/cartographer_ws/install_isolated/share/cartographer_ros/configuration_files";
     rviz_initialpose_subscriber = myNodeHandle.subscribe<geometry_msgs::PoseWithCovarianceStamped>
                         ("/initialpose", 1, &Node::HandleRvizInitialpose, this);
 
@@ -47,7 +47,7 @@ void Node::HandleRvizInitialpose(const geometry_msgs::PoseWithCovarianceStamped:
     ROS_INFO("initial_pose position    x:%f y:%f z:%f",msg->pose.pose.position.x,
                                     msg->pose.pose.position.y,msg->pose.pose.position.z);  
     ReinitPoseFromRviz(msg->pose.pose);
-
+    
 }
 
 
@@ -62,13 +62,15 @@ void Node::ReinitPoseFromRviz(geometry_msgs::Pose pose_from_rviz)
 
     FinishTrajectory();
     StartTrajectory();
+    Mymonitor.SetNewTrajectory(GetCurrentTrajectoryId(),ros::Time(0));
     
 }
 
 void Node::JudgeSlamState(const ::ros::TimerEvent& timer_event)
 { 
-    ROS_INFO("JudgeSlamStare in!");
+    ROS_INFO("JudgeSlamState in!");
     Mymonitor.ComparePose();
+    //Mymonitor.CalcMeanImuToUgv();
     //ComparePose();
     //ReadMetrics();  
     //ShowMetricsFamily(12);

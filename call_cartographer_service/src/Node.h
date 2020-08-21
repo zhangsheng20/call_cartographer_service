@@ -41,9 +41,8 @@ private:
     std::deque<nav_msgs::Odometry> ugv_odom_data_;
     std::deque<tf2::Quaternion> imu_to_ugv_;    
 
-    ros::Duration judge_slam_state_period_sec=ros::Duration(0.3);
+    ros::Duration judge_slam_state_period_sec=ros::Duration(0.03);
     ros::Timer judge_slam_state_timer_;
-
     
     void HandleRvizInitialpose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
     void HandleUgvOdom(const nav_msgs::Odometry::ConstPtr& msg);
