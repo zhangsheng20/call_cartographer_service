@@ -1,17 +1,19 @@
 
 #include "monitor_slam_state.h"
-
+#include <math.h>
 
 MonitorSlamState::MonitorSlamState()
 {
     //this->time_begin_=ros::Time::now();
     this->trajectory_id_=0;
+    this->mean_imu_to_ugv_.setRPY(0,0,0);
 }
 
 MonitorSlamState::MonitorSlamState(int trajectory_id ,ros::Time time_begin)
 {
     this->time_begin_=time_begin;
     this->trajectory_id_=trajectory_id;
+    this->mean_imu_to_ugv_.setRPY(0,0,0);
 }
 
 MonitorSlamState::~MonitorSlamState()
@@ -35,17 +37,40 @@ MonitorSlamState::~MonitorSlamState()
         imu_to_ugv.setRotation(imu_orientation_tf2*ugv_orientation_tf2.inverse());   
         imu_to_ugv.stamp_=mavros_imu_data_.back().header.stamp;
         imu_to_ugv_.push_back(imu_to_ugv);
+                  
+        ROS_INFO("imu_Y:%f  ugv_Y:%f    ",GetYaw(imu_orientation_tf2) ,GetYaw(ugv_orientation_tf2));                     
+        ROS_INFO("imu_to_ugv:%f",double(imu_to_ugv.getRotation().getAngle()));
+        //imu_to_ugv*ugv=imu   than imu_to_ugv = imu *ugv^-1
+        if(mean_imu_to_ugv_.getW()==1){
+            CalcMeanImuToUgv();          
+        }else
+        {
+            tf2::Quaternion imu_to_ugv_err_to_mean;
+            imu_to_ugv_err_to_mean=imu_to_ugv*mean_imu_to_ugv_.inverse();
+            ROS_INFO("slam_yaw_error:%f    ",GetYaw(imu_to_ugv_err_to_mean));   
+            if((GetYaw(imu_to_ugv_err_to_mean))> 0.1 ||(GetYaw(imu_to_ugv_err_to_mean))<- 0.1){
+                    ROS_INFO("!!!!!!!!!!!!!!!!!! SLAM ERROR !!!!!!!!!!!!!!  ");  
+                } 
+        }
 
+
+    }
+    else if(!mavros_imu_data_.empty() && ugv_odom_data_.empty() )
+    {
+        auto imu_orientation_msg = mavros_imu_data_.back().orientation;
+        tf2::Quaternion imu_orientation_tf2;
+        tf2::fromMsg(imu_orientation_msg,imu_orientation_tf2);
+       
+        //tf2::Quaternion imu_rotate;  //imu need to rotate 180 deg 
+        //imu_rotate.setRPY(3.14,0,0);
+        //imu_orientation_tf2=imu_rotate*imu_orientation_tf2;
+       
         tf2Scalar imu_orientation_R,imu_orientation_P,imu_orientation_Y;
         tf2::Matrix3x3(imu_orientation_tf2).getRPY
                                 (imu_orientation_R,imu_orientation_P,imu_orientation_Y);
-        tf2Scalar ugv_orientation_R,ugv_orientation_P,ugv_orientation_Y;
-        tf2::Matrix3x3(ugv_orientation_tf2).getRPY
-                                (ugv_orientation_R,ugv_orientation_P,ugv_orientation_Y);                               
-        ROS_INFO("imu_Y:%f  ugv_Y:%f  imu_R:%f  ugv_R:%f",imu_orientation_Y ,ugv_orientation_Y,imu_orientation_R,ugv_orientation_R);                     
-        ROS_INFO("imu_to_ugv:%f",double(imu_to_ugv.getRotation().getAngle()));
-        //imu_to_ugv*ugv=imu   than imu_to_ugv = imu *ugv^-1
-        CalcMeanImuToUgv();
+                            
+        ROS_INFO("imu_Y:%f   imu_R:%f ",imu_orientation_Y/3.1416*180 ,imu_orientation_R/3.1516*180);                     
+        
     }
     
  }
@@ -113,7 +138,7 @@ void MonitorSlamState::SetNewTrajectory(int trajectory_id,ros::Time time_begin)
     imu_to_ugv_.clear();  
     mean_imu_to_ugv_.setRPY(0,0,0);
 }
-void MonitorSlamState::CalcMeanImuToUgv()
+bool MonitorSlamState::CalcMeanImuToUgv()
 {
     ros::Duration trajectory_duration =(imu_to_ugv_.back().stamp_-time_begin_);
     ROS_INFO("trajectory_duration: %f",trajectory_duration.toSec());
@@ -138,8 +163,45 @@ void MonitorSlamState::CalcMeanImuToUgv()
         mean_imu_to_ugv_.setZ(sum_z/cnt);
         mean_imu_to_ugv_.setW(sum_w/cnt);
         mean_imu_to_ugv_.normalize();
-        ROS_INFO("********************mean imu_to_ugv :%f ******************",double(mean_imu_to_ugv_.getAngle()));
+        return true;
     }
-    
+    return false;
 
+}
+
+tf2Scalar MonitorSlamState::GetYaw( tf2::Quaternion orientation_tf2)
+{
+    
+    tf2Scalar orientation_R,orientation_P,orientation_Y;
+    tf2::Matrix3x3(orientation_tf2).getRPY
+                            (orientation_R,orientation_P,orientation_Y);
+    return orientation_Y;
+
+}
+
+tf2Scalar MonitorSlamState::GetYaw( geometry_msgs::Quaternion orientation_msg)
+{
+
+    tf2::Quaternion orientation_tf2;
+    tf2::fromMsg(orientation_msg,orientation_tf2);
+    GetYaw(orientation_tf2);
+
+}
+
+tf2Scalar MonitorSlamState::GetPitch( tf2::Quaternion orientation_tf2)
+{
+    
+    tf2Scalar orientation_R,orientation_P,orientation_Y;
+    tf2::Matrix3x3(orientation_tf2).getRPY
+                            (orientation_R,orientation_P,orientation_Y);
+    return orientation_P;
+}
+
+tf2Scalar MonitorSlamState::GetRoll( tf2::Quaternion orientation_tf2)
+{
+    
+    tf2Scalar orientation_R,orientation_P,orientation_Y;
+    tf2::Matrix3x3(orientation_tf2).getRPY
+                            (orientation_R,orientation_P,orientation_Y);
+    return orientation_R;
 }

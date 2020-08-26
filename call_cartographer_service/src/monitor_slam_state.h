@@ -21,9 +21,9 @@ private:
     int trajectory_id_;
     ros::Time time_begin_;
     tf2::Quaternion mean_imu_to_ugv_;
-    ros::Duration init_wait_duration=ros::Duration(3);
+    ros::Duration init_wait_duration=ros::Duration(5);
 
-    ros::Duration deque_duration_time=ros::Duration(10);
+    ros::Duration deque_duration_time=ros::Duration(20);
     ros::Duration calc_mean_duration=ros::Duration(3);
     
     std::deque<sensor_msgs::Imu> mavros_imu_data_;
@@ -41,5 +41,11 @@ public:
     void TrimUgvOdomData();
     void ComparePose();
     void SetNewTrajectory(int trajectory_id,ros::Time time_begin);
-    void CalcMeanImuToUgv();
+    bool CalcMeanImuToUgv();
+    tf2Scalar GetYaw( tf2::Quaternion orientation_tf2);
+    tf2Scalar GetPitch( tf2::Quaternion orientation_tf2);
+    tf2Scalar GetRoll( tf2::Quaternion orientation_tf2);
+    tf2Scalar GetYaw( geometry_msgs::Quaternion orientation_msg);
+    tf2Scalar GetPitch( geometry_msgs::Quaternion orientation_msg);
+    tf2Scalar GetRoll( geometry_msgs::Quaternion orientation_msg);
 };

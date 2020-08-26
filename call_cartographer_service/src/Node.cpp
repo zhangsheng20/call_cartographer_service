@@ -28,7 +28,7 @@ Node::Node()
 
     start_trajectory_srv.request.configuration_basename="my_rplidar_localization.lua";
     start_trajectory_srv.request.configuration_directory=
-            "/home/sheng/cartographer_ws/install_isolated/share/cartographer_ros/configuration_files";
+            "/home/ugv/cartographer_ws/install_isolated/share/cartographer_ros/configuration_files";
     rviz_initialpose_subscriber = myNodeHandle.subscribe<geometry_msgs::PoseWithCovarianceStamped>
                         ("/initialpose", 1, &Node::HandleRvizInitialpose, this);
 
@@ -70,6 +70,7 @@ void Node::JudgeSlamState(const ::ros::TimerEvent& timer_event)
 { 
     ROS_INFO("JudgeSlamState in!");
     Mymonitor.ComparePose();
+    ROS_INFO("JudgeSlamState over! \n");
     //Mymonitor.CalcMeanImuToUgv();
     //ComparePose();
     //ReadMetrics();  
